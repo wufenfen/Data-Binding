@@ -77,25 +77,34 @@
 					item.apply(null, arg);
 				}) 
 			}
+		} 
+
+		var pubSub = new PubSub(); 
+
+		function updateData(attr, value){
+			data[attr] = value;
+			pubSub.publish('model-update', attr, value);
 		}
 
-		function sayHi(){
-			console.log('hi~~~');
-		}
+		pubSub.subscribe('ui-update', function(attr, value){
+			updateData(attr, value);
+		});
 
-		function sayHello(name){
-			console.log('hello, ' + name);
-		}
-
-		var pubSub = new PubSub();
-		pubSub.subscribe('hi',sayHi);
-		pubSub.subscribe('hello',sayHello);
-
-		pubSub.publish('hi');
-		pubSub.publish('hello','Yecao');
-
-		pubSub.unsubscribe('hello',sayHello);
-		pubSub.publish('hello','Yecao');
+		pubSub.subscribe('model-update', function(attr, value){
+	 		for(var attr in data){ 
+				if( bindingsMap[attr] ){ 
+					bindingsMap[attr].forEach(function(item, index){
+						item.innerHTML = data[attr];
+					}) 
+				}
+				if(modelsMap[attr]){ 
+					modelsMap[attr].forEach(function(item, index){
+						item.value = data[attr];
+					}) 
+				}
+			}
+		});
+ 
 
 		function init(){   
 			models.forEach(function(item, index){
@@ -117,28 +126,12 @@
 					item.innerHTML = data[attr];
 				}
 			})
-		}
-		// change from Model to View
-		function refreshView(){  
-			for(var attr in data){ 
-				if( bindingsMap[attr] ){ 
-					bindingsMap[attr].forEach(function(item, index){
-						item.innerHTML = data[attr];
-					}) 
-				}
-				if(modelsMap[attr]){ 
-					modelsMap[attr].forEach(function(item, index){
-						item.value = data[attr];
-					}) 
-				}
-			}
-		}
-		// change from View to Model 
+		} 
+		 
 		document.addEventListener('keyup', function( e ){
 			var ele = e.target;
 			var attr = ele.getAttribute('yc-model');
-			data[attr] = ele.value;
-			refreshView(); 
+			pubSub.publish('ui-update', attr, ele.value); 
 		})
 
 		function changeName(){
@@ -147,12 +140,11 @@
 
 		clickEvent.addEventListener('click', function( e ){
 			e.preventDefault(); 
-			eval(this.getAttribute('yc-click'));
-			refreshView(); 
+			eval(this.getAttribute('yc-click')); 
+			pubSub.publish('model-update');
 		})
 
-		init();
-
+		init(); 
 
 	})
 	</script>
