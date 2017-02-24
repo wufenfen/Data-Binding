@@ -80,9 +80,13 @@
 			refreshView(); 
 		})
 
+		function changeName(){
+			data.name = "野蛮的小小芬";
+		}
+
 		clickEvent.addEventListener('click', function( e ){
 			e.preventDefault(); 
-			data.name = "野蛮的小小芬";
+			eval(this.getAttribute('yc-click'));
 			refreshView(); 
 		})
 
