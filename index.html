@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title> Demo for data binding </title>
+	<style>
+		body{
+			margin: 30px;
+		}
+
+		.result {
+			color: red;
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+	<p> Name：<input type="text" yc-model="name">  </p>
+	<p> Name22：<input type="text" yc-model="name"> </p>
+	<p> Company：<input type="text" yc-model="company">  </p>
+	<p> <button yc-click="changeName()"> Change Name </button></p>
+	<p> What you are typing: <span yc-bind="name" class="result"></span> from <span yc-bind="company" class="result"></span> </p>
+
+	<script>	
+	window.addEventListener('DOMContentLoaded',function(){ 
+
+		var models = document.querySelectorAll('[yc-model]');
+		var bindings = document.querySelectorAll('[yc-bind]');
+		var clickEvent = document.querySelector('[yc-click]');
+
+		var modelsMap = {};
+		var bindingsMap = {};
+
+		var data = {
+			name:"Claire_Yecao",
+			company: "Netease"
+		};
+
+		function init(){   
+			models.forEach(function(item, index){
+				var attr = item.getAttribute('yc-model');
+				if(!modelsMap[attr]){
+					modelsMap[attr] = [];
+				}
+				modelsMap[attr].push(item);
+				item.value = data[attr];
+			})
+
+			bindings.forEach(function(item, index){
+				var attr = item.getAttribute('yc-bind');
+				if(!bindingsMap[attr]){
+					bindingsMap[attr] = [];
+				}
+				bindingsMap[attr].push(item);
+				if(data[attr]){
+					item.innerHTML = data[attr];
+				}
+			})
+		}
+		// change from Model to View
+		function refreshView(){  
+			for(var attr in data){ 
+				if( bindingsMap[attr] ){ 
+					bindingsMap[attr].forEach(function(item, index){
+						item.innerHTML = data[attr];
+					}) 
+				}
+				if(modelsMap[attr]){ 
+					modelsMap[attr].forEach(function(item, index){
+						item.value = data[attr];
+					}) 
+				}
+			}
+		}
+		// change from View to Model 
+		document.addEventListener('keyup', function( e ){
+			var ele = e.target;
+			var attr = ele.getAttribute('yc-model');
+			data[attr] = ele.value;
+			refreshView(); 
+		})
+
+		clickEvent.addEventListener('click', function( e ){
+			e.preventDefault(); 
+			data.name = "野蛮的小小芬";
+			refreshView(); 
+		})
+
+		init();
+
+
+	})
+	</script>
+</body>
+</html>
