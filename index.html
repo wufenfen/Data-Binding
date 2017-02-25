@@ -15,6 +15,7 @@
 	</style>
 </head>
 <body>
+	<h1> 自己无章法的方式  </h1>
 	<p> Name：<input type="text" yc-model="name">  </p>
 	<p> Name22：<input type="text" yc-model="name"> </p>
 	<p> Company：<input type="text" yc-model="company">  </p>
@@ -22,6 +23,8 @@
 	<p> What you are typing: <span yc-bind="name" class="result"></span> from <span yc-bind="company" class="result"></span> </p>
 
 	<script>	
+/*	这是最初写的简单粗暴的方法，本质上用的是观察者模式*/
+
 	window.addEventListener('DOMContentLoaded',function(){ 
 
 		var models = document.querySelectorAll('[yc-model]');

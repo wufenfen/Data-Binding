@@ -15,15 +15,18 @@
 	</style>
 </head>
 <body>
-	<h1> 发布/订阅者方式 </h1>
+	<h1> 数据劫持方式 </h1>
 	<p> Name：<input type="text" yc-model="name">  </p>
 	<p> Name22：<input type="text" yc-model="name"> </p>
 	<p> Company：<input type="text" yc-model="company">  </p>
 	<p> <button yc-click="changeName()"> Change Name </button></p>
 	<p> What you are typing: <span yc-bind="name" class="result"></span> from <span yc-bind="company" class="result"></span> </p>
+	
+
+
 
 	<script>	
-	/* 将index.html修改抽象出来发布/订阅者模式 */
+	/*发布订阅者再结合object.defineProperty的方式*/
 	window.addEventListener('DOMContentLoaded',function(){ 
 
 		var models = document.querySelectorAll('[yc-model]');
@@ -33,11 +36,11 @@
 		var modelsMap = {};
 		var bindingsMap = {};
 
-		var data = {
+	/*	var data = {
 			name:"Claire_Yecao",
 			company: "Netease"
-		};
-
+		};*/
+ 
 		// this is a many-many relationship
 		function PubSub(){
 		 	this.map = {};
@@ -78,15 +81,30 @@
 			}
 		} 
 
-		var pubSub = new PubSub(); 
 
-		function updateData(attr, value){
-			data[attr] = value;
-			pubSub.publish('model-update', attr, value);
+		function defineProperty(obj, attr, value){ 
+			var _value;
+			Object.defineProperty(obj, attr, {
+				get:function (){
+					return _value; 
+				},
+				set:function (val){
+					_value = val;
+					pubSub.publish('model-update', attr, val);
+				},
+				enumerable: true 
+			})
+
+			obj[attr] = value;
 		}
 
+		var data= {};
+		var pubSub = new PubSub();  
+		defineProperty(data, 'name', "Claire_Yecao");
+		defineProperty(data, 'company', "Netease");
+
 		pubSub.subscribe('ui-update', function(attr, value){
-			updateData(attr, value);
+			data[attr] = value;
 		});
 
 		pubSub.subscribe('model-update', function(attr, value){
