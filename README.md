@@ -1,4 +1,4 @@
-# Data-Binding
+# 数据双向绑定的分析和简单实现
 
 ## 简介 
 
@@ -125,22 +125,22 @@ data.name; // get Claire_Yecao
 
 对于数组，我们针对数组的一些方法进行改写，使得它也能发生劫持。
 
-       var arrProto = Object.create(Array.prototype);
+    var arrProto = Object.create(Array.prototype);
 
-        ['shift','unshift','push','pop','slice','splice'].forEach(function(method){
-            Object.defineProperty(arrProto, method,{
-                value: function(){
-                    var result = Array.prototype[method].apply(this, arguments);
-                    console.log('检测数据发生变化'); 
-                    return result;
-                }
-            })
-        })
+     ['shift','unshift','push','pop','slice','splice'].forEach(function(method){
+         Object.defineProperty(arrProto, method,{
+             value: function(){
+                 var result = Array.prototype[method].apply(this, arguments);
+                 console.log('检测数据发生变化'); 
+                 return result;
+             }
+         })
+     })
 
-        var b = [];
-        b.__proto__ = arrProto;
+     var b = [];
+     b.__proto__ = arrProto;
 
-        b.push(1); // 1 '检测数据发生变化'
+     b.push(1); // 1 '检测数据发生变化'
 
 
 ## 脏检查
@@ -197,25 +197,16 @@ AngularJS的数据双向绑定是基于数据的脏检查机制的。大体意�
     }
 
 参考资料： 
-https://regularjs.github.io/guide/zh/advanced/dirty.html  脏检查: 数据绑定的秘密
-
-https://segmentfault.com/a/1190000006599500  剖析Vue原理&实现双向绑定MVVM
-
-https://github.com/xufei/blog/issues/10  徐飞 Angular沉思录（一）数据绑定
-
-http://www.lucaongaro.eu/blog/2012/12/02/easy-two-way-data-binding-in-javascript/  Easy Two-Way Data Binding in JavaScript
-
-http://www.cnblogs.com/jingwhale/p/5117419.html  Angular数据双向绑定
-
-http://www.cnblogs.com/wilber2013/p/5811810.html  JavaScript实现简单的双向绑定
-
-http://www.que01.top/2016/05/03/two-way-bind/  MVVM基础之双向绑定原理
-
-http://www.cnblogs.com/TomXu/archive/2012/03/02/2355128.html  深入理解JavaScript系列（32）：设计模式之观察者模式
-
-http://ks.netease.com/blog?id=6679   Vue框架核心之数据劫持
-
-http://ks.netease.com/blog?id=528   AngularJS 数据双向绑定揭秘
++ https://regularjs.github.io/guide/zh/advanced/dirty.html  脏检查: 数据绑定的秘密
++ https://segmentfault.com/a/1190000006599500  剖析Vue原理&实现双向绑定MVVM
++ https://github.com/xufei/blog/issues/10  徐飞 Angular沉思录（一）数据绑定
++ http://www.lucaongaro.eu/blog/2012/12/02/easy-two-way-data-binding-in-javascript/  Easy Two-Way Data Binding in JavaScript
++ http://www.cnblogs.com/jingwhale/p/5117419.html  Angular数据双向绑定
++ http://www.cnblogs.com/wilber2013/p/5811810.html  JavaScript实现简单的双向绑定
++ http://www.que01.top/2016/05/03/two-way-bind/  MVVM基础之双向绑定原理
++ http://www.cnblogs.com/TomXu/archive/2012/03/02/2355128.html  深入理解JavaScript系列（32）：设计模式之观察者模式
++ http://ks.netease.com/blog?id=6679   Vue框架核心之数据劫持
++ http://ks.netease.com/blog?id=528   AngularJS 数据双向绑定揭秘
 
 
 
