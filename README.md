@@ -22,48 +22,51 @@
 
 
 我的理解，原生JS中的事件就是一种观察者模式。比如鼠标的点击事件，只要它点击了，以addEventListener方式订阅它的回调函数就会第一时间收到通知。除了现成的事件，JS的创建自定义事件看起来更直观。
-     
+```
 var event = new Event('build');
-
 // 订阅者订阅事件.
 elem.addEventListener('build', function (e) { ... }, false);
 
 // 发布事件.
 elem.dispatchEvent(event);
-扯远了，我们回到数据双向绑定的主题上来。在数据发生变化的时候，我们发布一个叫‘model-update’的事件。类似，当视图发生变化的时候，我们发布一个叫‘ui-update’的事件。那么，在这些事件发生时想要做什么动作只要让它去订阅这些事件即可。下面是简单的实现，首先定义一个发布订阅者对象pubSub。
-         // 更新数据 
-        function updateData(attr, value){
-            data[attr] = value;
-            pubSub.publish('model-update', attr, value);
-        }
-        // 订阅ui-update事件 
-        pubSub.subscribe('ui-update', function(attr, value){
-            updateData(attr, value);
-        });
-       // 订阅model -update事件 
-        pubSub.subscribe('model-update', function(attr, value){
-            //更新视图中所有单向绑定的值，用类似ng-bind的形式
-             for(var attr in data){
-                if( bindingsMap[attr] ){
-                    bindingsMap[attr].forEach(function(item, index){
-                        item.innerHTML = data[attr];
-                    })
-                }
-            //更新视图中所有双向绑定的值，用类似ng-model的形式
-              if(modelsMap[attr]){
-                    modelsMap[attr].forEach(function(item, index){
-                        item.value = data[attr];
-                    })
-                }
-            }
-        });
-        //视图数据修改，发布ui-update事件   
-        document.addEventListener('keyup', function( e ){
-            var ele = e.target;
-            var attr = ele.getAttribute('yc-model');
-            pubSub.publish('ui-update', attr, ele.value);
-        })
+```
 
+扯远了，我们回到数据双向绑定的主题上来。在数据发生变化的时候，我们发布一个叫‘model-update’的事件。类似，当视图发生变化的时候，我们发布一个叫‘ui-update’的事件。那么，在这些事件发生时想要做什么动作只要让它去订阅这些事件即可。下面是简单的实现，首先定义一个发布订阅者对象pubSub。
+
+ ```    
+ // 更新数据 
+function updateData(attr, value){
+   data[attr] = value;
+   pubSub.publish('model-update', attr, value);
+}
+// 订阅ui-update事件 
+pubSub.subscribe('ui-update', function(attr, value){
+   updateData(attr, value);
+});
+// 订阅model -update事件 
+pubSub.subscribe('model-update', function(attr, value){
+   //更新视图中所有单向绑定的值，用类似ng-bind的形式
+    for(var attr in data){
+       if( bindingsMap[attr] ){
+           bindingsMap[attr].forEach(function(item, index){
+               item.innerHTML = data[attr];
+           })
+       }
+   //更新视图中所有双向绑定的值，用类似ng-model的形式
+     if(modelsMap[attr]){
+           modelsMap[attr].forEach(function(item, index){
+               item.value = data[attr];
+           })
+       }
+   }
+});
+//视图数据修改，发布ui-update事件   
+document.addEventListener('keyup', function( e ){
+   var ele = e.target;
+   var attr = ele.getAttribute('yc-model');
+   pubSub.publish('ui-update', attr, ele.value);
+})
+```
 每次更新数据用updateData函数，这个函数执行了赋值操作之后会发布‘model-update’事件，这样就手动地解决了数据到视图这方向的更新问题了。
 
 ## 数据劫持 
@@ -78,25 +81,25 @@ ES5中对象的属性有了属性描述符，可以用以下的方式去定义�
      })
 
 除此之外，还可以用getter，setter的方式赋值。当存在getter，setter函数时，属性的赋值操作会触发setter函数的执行，获取操作会触发getter函数的执行。按行业上的术语来说，这样的方法称之为数据劫持。举个栗子。 
-
+```         
 function defineProperty(obj, attr, value){
-          var _value;
-          Object.defineProperty(obj, attr, {
-                get:function (){
-                    console.log('get');
-                    return _value;
-                },
-                set:function (val){
-                    _value = val;
-                    console.log('监听到数据发生了变化 '); 
-                }
-            })
-            obj[attr] = value;
+       var _value;
+       Object.defineProperty(obj, attr, {
+             get:function (){
+                 console.log('get');
+                 return _value;
+             },
+             set:function (val){
+                 _value = val;
+                 console.log('监听到数据发生了变化 '); 
+             }
+         })
+         obj[attr] = value;
  }
 var data = {};
 defineProperty(data, 'name', "Claire_Yecao"); // "监听到数据发生了变化"
 data.name; // get Claire_Yecao
-
+```
 
 有了以上的方法之后，我们不难知道，当数据（对象）发生变化，只要在setter函数中发布就好。结合发布订阅者模式，将手动更新数据的updateData函数变成赋值操作，对象会自动执行setter函数，然后就能发布‘model-update’事件了。
 
@@ -172,7 +175,7 @@ AngularJS的数据双向绑定是基于数据的脏检查机制的。大体意�
 
     watchList.push(watchItem);
     
- //脏检查的入口: Data -> View
+    //脏检查的入口: Data -> View
     function apply(){
         var dirty = false;
 
@@ -195,14 +198,23 @@ AngularJS的数据双向绑定是基于数据的脏检查机制的。大体意�
 
 参考资料： 
 https://regularjs.github.io/guide/zh/advanced/dirty.html  脏检查: 数据绑定的秘密
+
 https://segmentfault.com/a/1190000006599500  剖析Vue原理&实现双向绑定MVVM
+
 https://github.com/xufei/blog/issues/10  徐飞 Angular沉思录（一）数据绑定
+
 http://www.lucaongaro.eu/blog/2012/12/02/easy-two-way-data-binding-in-javascript/  Easy Two-Way Data Binding in JavaScript
+
 http://www.cnblogs.com/jingwhale/p/5117419.html  Angular数据双向绑定
+
 http://www.cnblogs.com/wilber2013/p/5811810.html  JavaScript实现简单的双向绑定
+
 http://www.que01.top/2016/05/03/two-way-bind/  MVVM基础之双向绑定原理
+
 http://www.cnblogs.com/TomXu/archive/2012/03/02/2355128.html  深入理解JavaScript系列（32）：设计模式之观察者模式
+
 http://ks.netease.com/blog?id=6679   Vue框架核心之数据劫持
+
 http://ks.netease.com/blog?id=528   AngularJS 数据双向绑定揭秘
 
 
