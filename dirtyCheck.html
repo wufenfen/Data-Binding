@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title> Demo for data binding </title>
+	<style>
+		body{
+			margin: 30px;
+		}
+
+		.result {
+			color: red;
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+	<h1>  脏检查方式 </h1>
+	<p> Name：<input type="text" yc-model="name">  </p>
+	<p> Name22：<input type="text" yc-model="name"> </p>
+	<p> Company：<input type="text" yc-model="company">  </p>
+	<p> <button yc-click="changeName()"> Change Name </button></p>
+	<p> What you are typing: <span yc-bind="name" class="result"></span> from <span yc-bind="company" class="result"></span> </p>
+
+	<script>	
+	/*  angularjs，regularjs使用的脏检查 */
+	window.addEventListener('DOMContentLoaded',function(){ 
+
+		var models = document.querySelectorAll('[yc-model]');
+		var bindings = document.querySelectorAll('[yc-bind]');
+		var clickEvent = document.querySelector('[yc-click]');
+
+		var modelsMap = {};
+		var bindingsMap = {};
+
+		var data = {
+			name:"Claire_Yecao",
+			company: "Netease"
+		};  
+ 
+ 		var watchList = [];
+ 		var watchItem = {
+
+ 		};
+
+		function init(){   
+			models.forEach(function(item, index){
+				var attr = item.getAttribute('yc-model');
+				if(!modelsMap[attr]){
+					modelsMap[attr] = [];
+				}
+				modelsMap[attr].push(item);
+				item.value = data[attr];
+
+				if(modelsMap[attr].length == 1){ 
+					watchItem = {
+						last: item.value,
+						get: function(){
+							return data[attr];
+						},
+						callback: function(newVal, oldVal){
+							console.log("数据发生变化,从 " + oldVal + " 变到 " + newVal);
+						}
+					}
+
+					watchList.push(watchItem);
+				}
+
+			})
+
+			bindings.forEach(function(item, index){
+				var attr = item.getAttribute('yc-bind');
+				if(!bindingsMap[attr]){
+					bindingsMap[attr] = [];
+				}
+				bindingsMap[attr].push(item);
+				if(data[attr]){
+					item.innerHTML = data[attr];
+				}
+			})
+		}  
+
+		function refreshView(){  
+			for(var attr in data){ 
+				if( bindingsMap[attr] ){ 
+					bindingsMap[attr].forEach(function(item, index){
+						item.innerHTML = data[attr];
+					}) 
+				}
+				if(modelsMap[attr]){ 
+					modelsMap[attr].forEach(function(item, index){
+						item.value = data[attr];
+					}) 
+				}
+			}
+		}
+
+		//脏检查的入口: Data -> View
+		function apply(){
+			var dirty = false;
+
+			do{
+				watchList.forEach(function(item){
+					var newVal = item.get();
+					var oldVal = item.last;
+					if( newVal !== oldVal ){
+						item.callback(newVal, oldVal);
+						item.last = newVal;
+						dirty = true;
+					}
+					else{
+						dirty = false;
+					}
+				})
+			}while(dirty); 
+
+			refreshView();
+		} 
+		 
+		document.addEventListener('keyup', function( e ){
+			var ele = e.target;
+			var attr = ele.getAttribute('yc-model');
+ 			data[attr] = ele.value; 
+ 			apply();
+		})
+
+		function changeName(){ 
+			data.name = "野蛮的小小芬";
+		}
+
+		clickEvent.addEventListener('click', function( e ){
+			e.preventDefault(); 
+			eval(this.getAttribute('yc-click'));  
+			apply();
+		})
+
+		init(); 
+
+
+	})
+	</script>
+</body>
+</html>
