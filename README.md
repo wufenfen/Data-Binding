@@ -4,6 +4,7 @@
 
 自从Angularjs火起来之后，双向绑定经常被提及。双向绑定概念其实很简单，就是视图（View）的变化能实时让数据模型（Model）发生变化，而数据的变化也能实时更新到视图层。我们所说的单向数据绑定就是从数据到视图这一方向的关系。
 
+ [See Demo Here](https://wufenfen.github.io/Data-Binding)
 
 对于数据双向绑定，我们需要考虑的问题如下：
 
@@ -17,8 +18,6 @@
 而Model的变化监听方式可以有多种，主要有以下几种：  发布订阅模式（Backbone），数据劫持（VueJS，AvalonJS），数据脏检查（Angularjs，RegularJS）， View抽象的脏检查（ReactJS）。最后一个我们暂时不讨论，下面具体对前面的三种类型进行分析。
 
 ## 发布订阅模式
-
-[源码](https://github.com/wufenfen/Data-Binding/edit/master/PubSub.html) [Demo](https://wufenfen.github.io/Data-Binding/PubSub.html)
 
 发布订阅模式也称为观察者模式。直观地说，就是有一家报社和很多用户，报社就是发布者，用户就是订阅者。每当报社有新的报纸时，由于订阅者订阅了报纸，他们能第一时间收到新的报纸。当然订阅者也可以取消订阅。
 
