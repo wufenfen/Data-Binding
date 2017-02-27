@@ -133,14 +133,13 @@
 			pubSub.publish('ui-update', attr, ele.value); 
 		})
 
-		function changeName(){
-			data.name = "野蛮的小小芬";
+		function changeName(){ 
+			updateData('name', "野蛮的小小芬")
 		}
 
 		clickEvent.addEventListener('click', function( e ){
 			e.preventDefault(); 
-			eval(this.getAttribute('yc-click')); 
-			pubSub.publish('model-update');
+			eval(this.getAttribute('yc-click'));  
 		})
 
 		init(); 
@@ -149,3 +148,4 @@
 	</script>
 </body>
 </html>
+   
