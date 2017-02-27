@@ -18,6 +18,8 @@
 
 ## 发布订阅模式
 
+[源码](https://github.com/wufenfen/Data-Binding/edit/master/PubSub.html) [Demo](https://wufenfen.github.io/Data-Binding/PubSub.html)
+
 发布订阅模式也称为观察者模式。直观地说，就是有一家报社和很多用户，报社就是发布者，用户就是订阅者。每当报社有新的报纸时，由于订阅者订阅了报纸，他们能第一时间收到新的报纸。当然订阅者也可以取消订阅。
 
 
